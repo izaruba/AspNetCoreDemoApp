@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AspNetCoreDemoApp.Config;
+using Microsoft.AspNetCore.Builder;
 using WampSharp.AspNetCore.WebSockets.Server;
 using WampSharp.Binding;
 using WampSharp.V2;
@@ -13,6 +14,7 @@ namespace AspNetCoreDemoApp
 
             app.Map("/ws", builder =>
             {
+                builder.UseJwtBearerAuthentication(JwtBearerAuthentication.Options);
                 builder.UseWebSockets(new WebSocketOptions
                 {
                     ReplaceFeature = true

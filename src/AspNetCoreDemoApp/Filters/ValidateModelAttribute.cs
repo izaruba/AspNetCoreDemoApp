@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace AspNetCoreDemoApp
 {
-    public class ValidateModelStateAttribute : ActionFilterAttribute
+    public class ValidateModelAttribute : ActionFilterAttribute
     {
         public bool AllowNull { get; set; } = false;
 

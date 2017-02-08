@@ -1,9 +1,8 @@
-﻿using AspNetCoreDemoApp.Gameplay;
+﻿using AspNetCoreDemoApp.Config;
+using AspNetCoreDemoApp.Gameplay;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,7 +19,11 @@ namespace AspNetCoreDemoApp
 
             if (env.IsDevelopment())
             {
-                builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            }
+            else
+            {
+                builder.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
             }
 
             this.configuration = builder.Build();
@@ -32,8 +35,8 @@ namespace AspNetCoreDemoApp
         {
             services.AddSingleton<IWordsRepository>(new NonRecurringWordsRepository(new [] { "programming", "developer", "code" }));
             services.AddSingleton<GameServer>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<AuthenticationService>();
+           
+            services.AddAuthentication();
 
             services
                 .AddMvc()
@@ -48,16 +51,10 @@ namespace AspNetCoreDemoApp
                 loggerFactory.AddDebug();
             }
 
+            app.UseJwtBearerAuthentication(JwtBearerAuthentication.Options);
+
             app.UseWamp();
-
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
-                CookieName = "AUTH_COOKIE",
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true
-            });
-
+            
             app.UseMvc();
         }
     }
